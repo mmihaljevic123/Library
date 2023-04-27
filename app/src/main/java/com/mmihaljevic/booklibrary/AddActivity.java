@@ -41,6 +41,7 @@ public class AddActivity extends AppCompatActivity {
             public void onClick(View view) {
                 String title = title_input.getText().toString().trim();
                 String author = author_input.getText().toString().trim();
+                String pages = author_input.getText().toString().trim();
 
                 if (TextUtils.isEmpty(title) || TextUtils.isEmpty(author)) {
                     Toast.makeText(AddActivity.this, "Please enter a title and author", Toast.LENGTH_SHORT).show();
@@ -55,6 +56,7 @@ public class AddActivity extends AppCompatActivity {
                 try {
                     bookJson.put("title", title);
                     bookJson.put("author", author);
+                    bookJson.put("pages", pages);
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Toast.makeText(AddActivity.this, "Error creating book object", Toast.LENGTH_SHORT).show();

@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         book_id = new ArrayList<>();
         book_title = new ArrayList<>();
         book_author = new ArrayList<>();
-        //book_pages = new ArrayList<>();
+        book_pages = new ArrayList<>();
 
         storeDataInArrays();
 
@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
                     book_id.add(jsonObject.getString("id"));
                     book_title.add(jsonObject.getString("title"));
                     book_author.add(jsonObject.getString("author"));
-                    //book_pages.add(jsonObject.getString("pages"));
+                    book_pages.add(jsonObject.getString("pages"));
                 }
 
                 // Hide empty views if there is data to display
@@ -159,6 +159,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         builder.create().show();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        book_id.clear();
+        book_title.clear();
+        book_author.clear();
+        book_pages.clear();
+        storeDataInArrays();
+        customAdapter.notifyDataSetChanged();
     }
 }
 
