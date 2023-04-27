@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -19,7 +19,14 @@ import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,14 +34,21 @@ public class MainActivity extends AppCompatActivity {
     FloatingActionButton add_button;
     ImageView empty_imageview;
     TextView no_data;
-
-    MyDatabaseHelper myDB;
     ArrayList<String> book_id, book_title, book_author, book_pages;
     CustomAdapter customAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        int SDK_INT = android.os.Build.VERSION.SDK_INT;
+        if (SDK_INT > 8)
+        {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                    .permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+        }
+
         setContentView(R.layout.activity_main);
 
         recyclerView = findViewById(R.id.recyclerView);
@@ -49,11 +63,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        myDB = new MyDatabaseHelper(MainActivity.this);
+
         book_id = new ArrayList<>();
         book_title = new ArrayList<>();
         book_author = new ArrayList<>();
-        book_pages = new ArrayList<>();
+        //book_pages = new ArrayList<>();
 
         storeDataInArrays();
 
@@ -61,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
                 book_pages);
         recyclerView.setAdapter(customAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
-
     }
 
     @Override
@@ -72,20 +85,40 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    void storeDataInArrays(){
-        Cursor cursor = myDB.readAllData();
-        if(cursor.getCount() == 0){
-            empty_imageview.setVisibility(View.VISIBLE);
-            no_data.setVisibility(View.VISIBLE);
-        }else{
-            while (cursor.moveToNext()){
-                book_id.add(cursor.getString(0));
-                book_title.add(cursor.getString(1));
-                book_author.add(cursor.getString(2));
-                book_pages.add(cursor.getString(3));
+    void storeDataInArrays() {
+        try {
+            // Make GET request to API to retrieve book data
+            String url = "http://10.0.2.2:8080/books";
+            OkHttpClient client = new OkHttpClient();
+            Response response = client.newCall(new Request.Builder().url(url).build()).execute();
+
+            // Check if request was successful
+            if (response.isSuccessful()) {
+                System.out.println("Connection successful!!!");
+                JSONArray jsonArray = new JSONArray(response.body().string());
+
+                // Loop through response data and add to arrays
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    book_id.add(jsonObject.getString("id"));
+                    book_title.add(jsonObject.getString("title"));
+                    book_author.add(jsonObject.getString("author"));
+                    //book_pages.add(jsonObject.getString("pages"));
+                }
+
+                // Hide empty views if there is data to display
+                empty_imageview.setVisibility(View.GONE);
+                no_data.setVisibility(View.GONE);
+                System.out.println("Found data!!!");
+            } else {
+                // Handle unsuccessful request
+                empty_imageview.setVisibility(View.VISIBLE);
+                no_data.setVisibility(View.VISIBLE);
+                System.out.println("No data found!!!");
             }
-            empty_imageview.setVisibility(View.GONE);
-            no_data.setVisibility(View.GONE);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Failed to connect!!!");
         }
     }
 
@@ -128,3 +161,7 @@ public class MainActivity extends AppCompatActivity {
         builder.create().show();
     }
 }
+
+
+
+
