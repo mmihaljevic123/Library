@@ -26,6 +26,7 @@ public class AddActivity extends AppCompatActivity {
 
     EditText title_input, author_input, pages_input;
     Button add_button;
+    String restapiLink = "https://knjige-api.herokuapp.com/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +42,7 @@ public class AddActivity extends AppCompatActivity {
             public void onClick(View view) {
                 String title = title_input.getText().toString().trim();
                 String author = author_input.getText().toString().trim();
-                String pages = author_input.getText().toString().trim();
+                String pages = pages_input.getText().toString().trim();
 
                 if (TextUtils.isEmpty(title) || TextUtils.isEmpty(author)) {
                     Toast.makeText(AddActivity.this, "Please enter a title and author", Toast.LENGTH_SHORT).show();
@@ -67,7 +68,7 @@ public class AddActivity extends AppCompatActivity {
                 MediaType JSON = MediaType.parse("application/json; charset=utf-8");
                 RequestBody requestBody = RequestBody.create(JSON, bookJson.toString());
                 Request request = new Request.Builder()
-                        .url("http://10.0.2.2:8080/book") //route
+                        .url(restapiLink + "book") //route
                         .post(requestBody)
                         .build();
 

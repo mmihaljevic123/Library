@@ -28,8 +28,9 @@ public class UpdateActivity extends AppCompatActivity {
 
     EditText title_input, author_input, pages_input;
     Button update_button, delete_button;
-
     String id, title, author, pages;
+
+    String restapiLink = "https://knjige-api.herokuapp.com/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +72,7 @@ public class UpdateActivity extends AppCompatActivity {
                 }
 
                 // Make PUT request to API with updated book data
-                String url = "http://10.0.2.2:8080/book/" + id;
+                String url = restapiLink + "book/" + id;
                 OkHttpClient client = new OkHttpClient();
                 RequestBody body = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
                 Request request = new Request.Builder().url(url).put(body).build();
@@ -101,7 +102,7 @@ public class UpdateActivity extends AppCompatActivity {
     void getAndSetIntentData(){
         if(getIntent().hasExtra("id")){
             id = getIntent().getStringExtra("id");
-            String url = "http://10.0.2.2:8080/book/" + id;
+            String url = restapiLink + "book/" + id;
 
             try {
                 OkHttpClient client = new OkHttpClient();
@@ -143,7 +144,7 @@ public class UpdateActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialogInterface, int i) {
                 try {
                     OkHttpClient client = new OkHttpClient();
-                    String url = "http://10.0.2.2:8080/book/" + id;
+                    String url = restapiLink + "book/" + id;
 
                     Request request = new Request.Builder()
                             .url(url)

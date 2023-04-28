@@ -22,8 +22,11 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
+import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -36,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
     TextView no_data;
     ArrayList<String> book_id, book_title, book_author, book_pages;
     CustomAdapter customAdapter;
+
+    String restapiLink = "https://knjige-api.herokuapp.com/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
     void storeDataInArrays() {
         try {
             // Make GET request to API to retrieve book data
-            String url = "http://10.0.2.2:8080/books";
+            String url = restapiLink + "books";
             OkHttpClient client = new OkHttpClient();
             Response response = client.newCall(new Request.Builder().url(url).build()).execute();
 
@@ -144,8 +149,7 @@ public class MainActivity extends AppCompatActivity {
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                MyDatabaseHelper myDB = new MyDatabaseHelper(MainActivity.this);
-                myDB.deleteAllData();
+                deleteAllData();
                 //Refresh Activity
                 Intent intent = new Intent(MainActivity.this, MainActivity.class);
                 startActivity(intent);
@@ -160,6 +164,30 @@ public class MainActivity extends AppCompatActivity {
         });
         builder.create().show();
     }
+
+    public void deleteAllData() {
+        OkHttpClient client = new OkHttpClient();
+
+        Request request = new Request.Builder()
+                .url(restapiLink + "books")
+                .delete()
+                .build();
+
+        Call call = client.newCall(request);
+
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                // Handle error
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                // Handle response
+            }
+        });
+    }
+
 
     @Override
     protected void onResume() {
